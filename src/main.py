@@ -6,7 +6,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score, classification_report, confusion_matrix
 
-data = pd.read_csv("../data/measures_v2.csv")
+data = pd.read_csv("C:\\Users\\jazzp\\Documents\\ProjectAPK\\motor_failure_prediction\\data\\measures_v2.csv")
 
 y = data["stator_winding"]
 X = data.drop(columns=["stator_winding", "profile_id"])
@@ -86,6 +86,17 @@ sample_scaled_reg = scaler.transform(sample_sensor)
 risk_pred = clf.predict(sample_scaled_cls)
 thermal_pred = reg_model.predict(sample_scaled_reg)
 
+rng = np.random.default_rng()
+
+random_idx = rng.choice(len(Xc_test), size=5, replace=False)
+sample_sensor = Xc_test.iloc[random_idx]
+
+sample_scaled_cls = scaler_cls.transform(sample_sensor)
+sample_scaled_reg = scaler.transform(sample_sensor)
+
+risk_pred = clf.predict(sample_scaled_cls)
+thermal_pred = reg_model.predict(sample_scaled_reg)
+
 print("\nREAL SYSTEM SIMULATION")
 
 for i in range(5):
@@ -95,10 +106,16 @@ for i in range(5):
         else "EMERGENCY SHUTDOWN"
     )
 
-    print(f"""
-Predicted Temp : {thermal_pred[i]:.2f} °C
-Predicted Risk : {risk_pred[i]}
-Action         : {action}
-""")
+    print("\n======================================")
+    print("INPUT SENSOR DATA →")
+
+    row = sample_sensor.iloc[i]
+    for col in sample_sensor.columns:
+        print(f"{col:<15}: {row[col]:.3f}")
+
+    print("\nPREDICTION OUTPUT →")
+    print(f"Predicted Temp : {thermal_pred[i]:.2f} °C")
+    print(f"Predicted Risk : {risk_pred[i]}")
+    print(f"Action         : {action}")
 
 print("\nSYSTEM STATUS: PREDICTIVE MAINTENANCE PIPELINE ACTIVE")

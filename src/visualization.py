@@ -4,9 +4,16 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
+import os
 
-data = pd.read_csv("../data/measures_v2.csv")
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_PATH = os.path.join(BASE_DIR, "..", "data", "measures_v2.csv")
+
+
+data = pd.read_csv(DATA_PATH)
+
+# REGRESSION DATA PREPARATION
 y = data["stator_winding"]
 X = data.drop(columns=["stator_winding", "profile_id"])
 
@@ -23,35 +30,52 @@ model.fit(X_train_scaled, y_train)
 
 y_pred = model.predict(X_test_scaled)
 
-plt.figure()
-plt.scatter(y_test[:2000], y_pred[:2000], alpha=0.6)
-plt.xlabel("Actual Temperature")
-plt.ylabel("Predicted Temperature")
-plt.title("Actual vs Predicted Temperature")
+
+# 1) REAL vs PREDICTED
+plt.figure(figsize=(7,6))
+plt.scatter(y_test[:3000], y_pred[:3000], alpha=0.6, color="red")
+plt.xlabel("Real Stator Winding Temperature (°C)")
+plt.ylabel("Predicted Temperature (°C)")
+plt.title("Real vs Predicted Temperature")
+plt.grid(True)
+plt.tight_layout()
 plt.show()
 
+# 2) RESIDUAL ERROR DISTRIBUTION
 errors = y_test - y_pred
-plt.figure()
-plt.hist(errors, bins=60)
-plt.title("Prediction Error Distribution")
-plt.xlabel("Error (°C)")
+
+plt.figure(figsize=(7,6))
+plt.hist(errors, bins=80, color="steelblue", edgecolor="black")
+plt.xlabel("Prediction Error (°C)")
 plt.ylabel("Frequency")
+plt.title("Residual Error Distribution")
+plt.grid(True)
+plt.tight_layout()
 plt.show()
 
-coeff = model.coef_
-features = X.columns
 
-plt.figure()
-plt.barh(features, coeff)
-plt.title("Feature Importance (Linear Regression)")
-plt.xlabel("Coefficient Value")
-plt.show()
+# 3) RISK LEVEL DISTRIBUTION
 
-plt.figure()
-plt.plot(y_test.values[:500], label="Actual")
-plt.plot(y_pred[:500], label="Predicted")
-plt.title("Thermal Prediction Signal")
-plt.xlabel("Sample Index")
-plt.ylabel("Temperature")
-plt.legend()
+data["risk_level"] = pd.cut(
+    data["stator_winding"],
+    bins=[-np.inf, 90, 110, np.inf],
+    labels=["NORMAL", "WARNING", "CRITICAL"]
+)
+
+risk_counts = data["risk_level"].value_counts().sort_index()
+
+colors = {
+    "NORMAL": "green",
+    "WARNING": "orange",
+    "CRITICAL": "red"
+}
+
+bar_colors = [colors[level] for level in risk_counts.index]
+
+plt.figure(figsize=(7,6))
+plt.bar(risk_counts.index, risk_counts.values, color=bar_colors)
+plt.xlabel("Risk Level")
+plt.ylabel("Count")
+plt.title("Risk Level Distribution")
+plt.tight_layout()
 plt.show()
