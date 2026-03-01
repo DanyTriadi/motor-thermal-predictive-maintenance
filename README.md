@@ -1,6 +1,5 @@
 =======Judul========
-Motor Thermal Predictive Maintenance
-
+Industrial Motor Overheating Prediction System
 =======Deskripsi=======
 Proyek ini bertujuan untuk memprediksi suhu motor industri supaya dapat mencegah
 kerusakan yang mendalam akibat overheating. Dengan memprediksi suhu motror dimasa depan, kita dapat mengetahui kapam motor berada didalam risiko yang tinggi dan melakikan tindakan preventig sebelum kerusakan parah terjadi.
