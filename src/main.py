@@ -6,7 +6,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score, classification_report, confusion_matrix
 
-data = pd.read_csv("C:\\Users\\jazzp\\Documents\\ProjectAPK\\motor_failure_prediction\\data\\measures_v2.csv")
+data = pd.read_csv("C:\\Users\\jazzp\\Documents\\ProjectAPK\\Industrial_Motor_Overheating_Prediction_System\\data\\measures_v2.csv")
 
 y = data["stator_winding"]
 X = data.drop(columns=["stator_winding", "profile_id"])
